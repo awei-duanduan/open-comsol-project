@@ -8,6 +8,7 @@ param(
     [switch]$BlankModel,
     [switch]$Probe,
     [switch]$SkipProbe,
+    [switch]$NoInitialize,
     [switch]$Help
 )
 
@@ -23,6 +24,7 @@ function Show-Usage {
     Write-Host "  -BlankModel           Explicitly open COMSOL GUI without a model."
     Write-Host "  -Probe                Run the Python probe after COMSOL GUI opens."
     Write-Host "  -SkipProbe            Compatibility alias: do not run the Python probe."
+    Write-Host "  -NoInitialize         Fail instead of launching first-use initializer when config.env is missing."
     Write-Host "  -PythonExe <path>     Python executable that has the 'mph' package installed."
     Write-Host "  -ProbeTimeoutSeconds  Maximum seconds to wait for the Python probe. Default: 45."
     Write-Host "  -ConfigPath <path>    Configuration file with COMSOL paths and server settings."
@@ -48,12 +50,27 @@ function Resolve-DefaultConfigPath {
     return (Join-Path (Get-SkillRoot) "config.env")
 }
 
-function Assert-ConfigExists {
+function Ensure-Config {
     param([Parameter(Mandatory = $true)][string]$Path)
 
-    if (-not (Test-Path -LiteralPath $Path)) {
-        $initScript = Join-Path $PSScriptRoot "Initialize-ComsolSkill.ps1"
+    if (Test-Path -LiteralPath $Path) {
+        return
+    }
+
+    $initScript = Join-Path $PSScriptRoot "Initialize-ComsolSkill.ps1"
+    if ($NoInitialize) {
         throw "Config file not found: $Path. Run first: powershell -NoProfile -ExecutionPolicy Bypass -File `"$initScript`""
+    }
+
+    Write-Host "Config file not found: $Path"
+    Write-Host "Starting first-use initialization..."
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $initScript -ConfigPath $Path
+    if ($LASTEXITCODE -ne 0) {
+        throw "First-use initialization failed."
+    }
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        throw "Initialization finished but config file was not created: $Path"
     }
 }
 
@@ -210,7 +227,7 @@ else {
     $resolvedModel = (Resolve-Path -LiteralPath $ModelPath).Path
 }
 
-Assert-ConfigExists -Path $ConfigPath
+Ensure-Config -Path $ConfigPath
 $config = Read-BatEnv -Path $ConfigPath
 
 $serverHost = $config["SERVER_HOST"]

@@ -48,8 +48,33 @@ The initializer will:
 - Let you press Enter to accept detected paths.
 - Prompt you to type paths manually if detection fails.
 - Create a local `config.env`.
+- Run an environment check after writing `config.env`.
 
 Do not commit `config.env`. It is machine-specific and is ignored by `.gitignore`.
+
+If you skip this step and run the start scripts directly, they will launch the initializer automatically. Use `-NoInitialize` only in non-interactive automation where missing configuration should fail immediately.
+
+### Environment Check
+
+Run this after installation, after moving COMSOL, or when the skill cannot start COMSOL:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\scripts\Test-ComsolEnvironment.ps1"
+```
+
+The check verifies:
+
+- `config.env` exists and can be parsed.
+- `SERVER_BAT` points to `comsolmphserver.exe`.
+- `COMSOL_GUI_EXE` points to `comsol.exe`.
+- `SERVER_ARGS` uses the same port as `SERVER_PORT`.
+- The configured port status.
+
+Optional Python `mph` check:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\scripts\Test-ComsolEnvironment.ps1" -CheckPython
+```
 
 ### Configuration
 
@@ -135,6 +160,8 @@ This disconnects the server session without intentionally closing COMSOL GUI.
 ### Troubleshooting
 
 - If startup fails, rerun `Initialize-ComsolSkill.ps1 -Force`.
+- If the skill was just downloaded, run `Initialize-ComsolSkill.ps1` or let the start script launch it automatically.
+- If configuration looks wrong, run `Test-ComsolEnvironment.ps1`.
 - If the configured port is busy, change both `SERVER_PORT` and `SERVER_ARGS`.
 - If Python probing hangs, first check TCP connections; GUI may still be connected.
 - If Python cannot import `mph`, install/configure the Python environment used by COMSOL automation.
@@ -188,8 +215,33 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ".\scripts\Initialize-Comsol
 - 允许你直接按 Enter 接受检测结果。
 - 如果检测失败，会提示你手动输入路径。
 - 生成本地 `config.env`。
+- 写入 `config.env` 后自动运行环境检查。
 
 不要提交 `config.env`。它是本机专属配置，已经被 `.gitignore` 忽略。
+
+如果你跳过这一步直接运行启动脚本，启动脚本会自动进入初始化流程。只有在非交互自动化场景中，才建议使用 `-NoInitialize` 让缺少配置时立即失败。
+
+### 环境检查
+
+安装后、移动 COMSOL 安装目录后，或 skill 无法启动 COMSOL 时，运行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\scripts\Test-ComsolEnvironment.ps1"
+```
+
+该检查会验证：
+
+- `config.env` 是否存在且可解析。
+- `SERVER_BAT` 是否指向 `comsolmphserver.exe`。
+- `COMSOL_GUI_EXE` 是否指向 `comsol.exe`。
+- `SERVER_ARGS` 是否和 `SERVER_PORT` 使用同一个端口。
+- 当前配置端口的占用状态。
+
+可选 Python `mph` 检查：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\scripts\Test-ComsolEnvironment.ps1" -CheckPython
+```
 
 ### 配置文件
 
@@ -275,6 +327,8 @@ foreach ($serverPid in $serverPids) {
 ### 常见问题
 
 - 如果启动失败，重新运行 `Initialize-ComsolSkill.ps1 -Force`。
+- 如果刚从网上下载该 skill，先运行 `Initialize-ComsolSkill.ps1`，或让启动脚本自动进入初始化。
+- 如果配置看起来不对，运行 `Test-ComsolEnvironment.ps1`。
 - 如果端口被占用，同时修改 `SERVER_PORT` 和 `SERVER_ARGS`。
 - 如果 Python 探测卡住，先检查 TCP 连接；GUI 可能已经连接成功。
 - 如果 Python 无法导入 `mph`，请配置用于 COMSOL 自动化的 Python 环境。

@@ -1,5 +1,6 @@
 param(
-    [string]$ConfigPath
+    [string]$ConfigPath,
+    [switch]$NoInitialize
 )
 
 $ErrorActionPreference = "Stop"
@@ -12,10 +13,31 @@ if (-not $ConfigPath) {
     $ConfigPath = Join-Path (Get-SkillRoot) "config.env"
 }
 
-if (-not (Test-Path -LiteralPath $ConfigPath)) {
+function Ensure-Config {
+    param([Parameter(Mandatory = $true)][string]$Path)
+
+    if (Test-Path -LiteralPath $Path) {
+        return
+    }
+
     $initScript = Join-Path $PSScriptRoot "Initialize-ComsolSkill.ps1"
-    throw "Config file not found: $ConfigPath. Run first: powershell -NoProfile -ExecutionPolicy Bypass -File `"$initScript`""
+    if ($NoInitialize) {
+        throw "Config file not found: $Path. Run first: powershell -NoProfile -ExecutionPolicy Bypass -File `"$initScript`""
+    }
+
+    Write-Host "Config file not found: $Path"
+    Write-Host "Starting first-use initialization..."
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $initScript -ConfigPath $Path
+    if ($LASTEXITCODE -ne 0) {
+        throw "First-use initialization failed."
+    }
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        throw "Initialization finished but config file was not created: $Path"
+    }
 }
+
+Ensure-Config -Path $ConfigPath
 
 function Read-BatEnv {
     param([Parameter(Mandatory = $true)][string]$Path)

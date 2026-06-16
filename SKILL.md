@@ -1,6 +1,6 @@
 ---
 name: open-comsol-project
-description: Use when the user wants to start COMSOL, use COMSOL Server or mphserver, initialize COMSOL executable paths, auto-open an .mph model, open COMSOL GUI without a model, monitor localhost:2038, or run a Python mph probe.
+description: Use when the user wants to start COMSOL, use COMSOL Server or mphserver, initialize or check COMSOL executable paths, auto-open an .mph model, open COMSOL GUI without a model, monitor localhost:2038, or run a Python mph probe.
 ---
 
 # Open COMSOL Project
@@ -15,9 +15,29 @@ Before starting COMSOL on a new machine, initialize local paths:
 powershell -NoProfile -ExecutionPolicy Bypass -File "<skill-root>\scripts\Initialize-ComsolSkill.ps1"
 ```
 
-The initializer searches common COMSOL install locations. It shows detected `comsolmphserver.exe` and `comsol.exe` paths, lets the user press Enter to accept them, or prompts the user to type paths manually. It writes a local `config.env` next to this `SKILL.md`.
+The initializer searches common COMSOL install locations. It shows detected `comsolmphserver.exe` and `comsol.exe` paths, lets the user press Enter to accept them, or prompts the user to type paths manually. It writes a local `config.env` next to this `SKILL.md`, then runs:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "<skill-root>\scripts\Test-ComsolEnvironment.ps1"
+```
 
 Do not commit `config.env`; commit only `config.example.env`.
+
+If `Start-ComsolWorkflow.ps1` or `Start-ComsolServer.ps1` is run before `config.env` exists, it will launch the initializer automatically. Use `-NoInitialize` only when a non-interactive run should fail instead of prompting.
+
+## Environment Check
+
+Run the check whenever a user reports the skill cannot start COMSOL:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "<skill-root>\scripts\Test-ComsolEnvironment.ps1"
+```
+
+For optional Python `mph` validation:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "<skill-root>\scripts\Test-ComsolEnvironment.ps1" -CheckPython
+```
 
 ## Standard Workflow
 

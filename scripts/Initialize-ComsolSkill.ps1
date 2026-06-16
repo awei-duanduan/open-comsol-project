@@ -7,6 +7,7 @@ param(
     [int]$StartupTimeoutSeconds = 120,
     [int]$ProbeTimeoutSeconds = 45,
     [switch]$AcceptDefaults,
+    [switch]$SkipCheck,
     [switch]$Force
 )
 
@@ -147,3 +148,13 @@ $lines = @(
 
 Set-Content -LiteralPath $ConfigPath -Value $lines -Encoding ASCII
 Write-Host "Wrote COMSOL skill config: $ConfigPath"
+
+if (-not $SkipCheck) {
+    $checkScript = Join-Path $PSScriptRoot "Test-ComsolEnvironment.ps1"
+    Write-Host ""
+    Write-Host "Running environment check..."
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $checkScript -ConfigPath $ConfigPath
+    if ($LASTEXITCODE -ne 0) {
+        throw "Environment check failed. Re-run this initializer with -Force after correcting the paths."
+    }
+}
