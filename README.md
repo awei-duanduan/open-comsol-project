@@ -33,6 +33,53 @@ Example:
 git clone https://github.com/awei-duanduan/open-comsol-project.git
 ```
 
+For a typical Codex setup on Windows, clone it into your Codex skills directory:
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.codex\skills" | Out-Null
+git clone https://github.com/awei-duanduan/open-comsol-project.git "$env:USERPROFILE\.codex\skills\open-comsol-project"
+```
+
+### Codex Command Usage
+
+After installation, start a new Codex session or ask Codex to use this skill explicitly:
+
+```text
+[$open-comsol-project](C:\Users\<you>\.codex\skills\open-comsol-project\SKILL.md) open COMSOL
+```
+
+Open a specific `.mph` model:
+
+```text
+[$open-comsol-project](C:\Users\<you>\.codex\skills\open-comsol-project\SKILL.md) open C:\path\to\model.mph
+```
+
+Initialize or re-check the local COMSOL environment:
+
+```text
+[$open-comsol-project](C:\Users\<you>\.codex\skills\open-comsol-project\SKILL.md) initialize COMSOL configuration
+```
+
+```text
+[$open-comsol-project](C:\Users\<you>\.codex\skills\open-comsol-project\SKILL.md) check COMSOL environment
+```
+
+Disconnect the COMSOL Server session:
+
+```text
+[$open-comsol-project](C:\Users\<you>\.codex\skills\open-comsol-project\SKILL.md) disconnect COMSOL Server
+```
+
+You can also use natural language without the explicit skill link once Codex has indexed the skill:
+
+```text
+Use open-comsol-project to open C:\path\to\model.mph
+```
+
+```text
+Use open-comsol-project to start COMSOL without a model
+```
+
 ### First-Time Setup
 
 Run the initializer once on each new machine:
@@ -198,6 +245,53 @@ This disconnects the server session without intentionally closing COMSOL GUI.
 
 ```powershell
 git clone https://github.com/awei-duanduan/open-comsol-project.git
+```
+
+Windows 上常见的 Codex 安装方式是克隆到 Codex skills 目录：
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.codex\skills" | Out-Null
+git clone https://github.com/awei-duanduan/open-comsol-project.git "$env:USERPROFILE\.codex\skills\open-comsol-project"
+```
+
+### Codex 命令使用教程
+
+安装后，开启一个新的 Codex 会话，或显式让 Codex 使用这个 skill：
+
+```text
+[$open-comsol-project](C:\Users\<you>\.codex\skills\open-comsol-project\SKILL.md) 打开 COMSOL
+```
+
+打开指定 `.mph` 模型：
+
+```text
+[$open-comsol-project](C:\Users\<you>\.codex\skills\open-comsol-project\SKILL.md) 打开 C:\path\to\model.mph
+```
+
+初始化或重新检查本地 COMSOL 环境：
+
+```text
+[$open-comsol-project](C:\Users\<you>\.codex\skills\open-comsol-project\SKILL.md) 初始化 COMSOL 配置
+```
+
+```text
+[$open-comsol-project](C:\Users\<you>\.codex\skills\open-comsol-project\SKILL.md) 检查 COMSOL 环境
+```
+
+断开 COMSOL Server 会话：
+
+```text
+[$open-comsol-project](C:\Users\<you>\.codex\skills\open-comsol-project\SKILL.md) 断开 COMSOL Server
+```
+
+当 Codex 已经索引到该 skill 后，也可以直接用自然语言：
+
+```text
+使用 open-comsol-project 打开 C:\path\to\model.mph
+```
+
+```text
+使用 open-comsol-project 启动 COMSOL，不打开模型
 ```
 
 ### 首次初始化
